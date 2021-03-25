@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
+const { response } = require('express');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
@@ -41,18 +42,20 @@ client.connect(err => {
         productCollection.insertOne(product)
         .then(result =>{
             console.log('data added successfully');
-            res.send('success');
+            // res.send('success');
+            res.redirect('/')
         })
     })
 
     app.patch('/update/:id' ,(req, res)=>{
-        console.log(req.body.price);
+        // console.log(req.body.price);
         productCollection.updateOne({_id: ObjectId(req.params.id)},
         {
             $set: {price: req.body.price, quantity: req.body.quantity}
         })
         .then(result=>{
-            console.log(result);
+            // console.log(result);
+            res.send(result.modifiedCount > 0)
         })
     })
 
@@ -60,7 +63,8 @@ client.connect(err => {
     app.delete('/delete/:id', (req, res) => {
         productCollection.deleteOne({_id: ObjectId(req.params.id)})
         .then( result => {
-            console.log(result);
+            res.send(result.deletedCount > 0)
+            // console.log(result);
         })
     })
 
